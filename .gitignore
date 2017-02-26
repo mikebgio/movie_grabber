@@ -40,3 +40,4 @@ Thumbs.db
 ################
 praw.ini
 config.py
+*.pyc
