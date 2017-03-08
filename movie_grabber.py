@@ -1,4 +1,5 @@
 # CLI Tool for downloading Full Movies on YouTube via Reddit.
+# See README.md for setup instructions
 # V0.03 App which gets links from r/fullmoviesonyoutube
 # and now grabs MovieGuide comments for IMDb info
 
