@@ -42,3 +42,4 @@ praw.ini
 config.py
 *.pyc
 venv/
+venv_movie_grabber/
