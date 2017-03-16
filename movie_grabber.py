@@ -4,10 +4,12 @@
 # and now grabs MovieGuide comments for IMDb info
 
 import praw     #for interacting w/Reddit
+import spinner
 #import config  #this will contain download options
 #import time    #This will be used for request-limiting (maybe)
 import os      #This will be used for storing history
 
+spinney = spinner.Spinner() #create a spinner from spinner.py
 div = "\n" + ("~*" * 20) # This is just a divider for printing
 guide_error = "Sorry, there is no info available for this movie." # Error msg for no guide comment
 
@@ -16,6 +18,8 @@ subreddit = reddit.subreddit('fullmoviesonyoutube')
 
 def get_submissions(subreddit):
     """Grabs the 10 newest submissions"""
+    print("Grabbing 10 movies...")
+    spinney.start() #animate spinner while running rest of method
     submissions = []   # This will be the list of 10 links, each stored as dict
     for submission in subreddit.new(limit=10): # Iterate through 10 newest submissions
         guide = get_guide_comment(submission)
@@ -27,6 +31,7 @@ def get_submissions(subreddit):
             score = submission.score,
             guide = guide)
         submissions.append(subdata) # Store each submission dictionary in list
+    spinney.stop() #stop animation
     return submissions
 
 def print_submissions(subslist):
@@ -59,7 +64,6 @@ def print_more_info(query, subslist):
     print(str(query) + ": " + subslist[query]['title'])
     print(cast_crew)
     print(description) #Just prints RAW Source for now (will fix with string stuff)
-
 
 
 subslist = get_submissions(subreddit)
