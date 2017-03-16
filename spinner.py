@@ -1,4 +1,6 @@
 # Pulled from http://stackoverflow.com/a/39504463 - Victor Moyseenko
+# This is just an animated spinner for loading sequence
+# May replace with something home-baked when I understand threading better
 
 import sys
 import time
