@@ -1,7 +1,6 @@
 # CLI Tool for downloading Full Movies on YouTube via Reddit.
 # See README.md for setup instructions
-# V0.04 Adding in logging of posts and ability to pull
-# new posts
+# V0.05 Adding in downloading framework
 
 from __future__ import unicode_literals
 import youtube_dl
