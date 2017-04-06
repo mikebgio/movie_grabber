@@ -3,13 +3,17 @@
 # V0.04 Adding in logging of posts and ability to pull
 # new posts
 
+from __future__ import unicode_literals
+import youtube_dl
 import praw     # for interacting w/Reddit
 import spinner  # bring in the loading animation
 
-spin = spinner.Spinner()  # create a spinner from spinner.py
-div = "\n" + ("~*" * 20)  # This is just a divider for printing
+SPIN = spinner.Spinner()  # create a spinner from spinner.py
+DIV = "\n" + ("~*" * 20)  # This is just a Divider for printing
 # Error msg for no guide comment
-guide_error = "Sorry, there is no info available for this movie."
+GUIDE_ERROR = "Sorry, there is no info available for this movie."
+AFFIRMATIVE = ['y', 'Y']
+NEGATIVE = ['n', 'N']
 
 reddit = praw.Reddit('movie_grabber', user_agent='movie_grabber user agent')
 subreddit = reddit.subreddit('fullmoviesonyoutube')
@@ -18,13 +22,13 @@ subreddit = reddit.subreddit('fullmoviesonyoutube')
 def get_submissions(subreddit, subs_viewed):
     """Grabs the 10 newest submissions"""
     print("Grabbing 10 movies...")
-    # spin.start()  # animate spinner while running rest of method
+    SPIN.start()  # animate spinner while running rest of method
     submissions = []   # This will be the list of 10 links, each stored as dict
     # Iterate through 10 newest submissions
     for submission in subreddit.new(limit=10):
         guide = get_guide_comment(submission)  # find MovieGuide comment
         if guide is None:  # if MovieGuide comment cannot be found, load error message
-            guide = guide_error
+            guide = GUIDE_ERROR
         subdata = dict(  # Store submission data as dictionary of title:{necessary data}
             title=submission.title,
             subid=submission.id,
@@ -33,7 +37,7 @@ def get_submissions(subreddit, subs_viewed):
             guide=guide)  # store MovieGuide comment for user retrieval
         submissions.append(subdata)  # Store each submission dictionary in list
         log_viewed(submissions)
-    # spin.stop()  # stop animation
+    SPIN.stop()  # stop animation
     return submissions
 
 
@@ -42,7 +46,7 @@ def print_submissions(subslist):
     out with index and score pretty-like"""
     for i, v in enumerate(subslist):
         print(str(i) + ": " + v['title'] +
-              " :: SCORE: " + str(v['score']) + div)
+              " :: SCORE: " + str(v['score']) + DIV)
 
 
 def get_guide_comment(submission):
@@ -58,7 +62,7 @@ def print_more_info(query, subslist):
     """Provide user Title and Guide text if
     they enter <info-request-command>"""
     guide = subslist[query]['guide']  # load full guide comment source
-    if guide == guide_error:
+    if guide == GUIDE_ERROR:
         description = guide
         cast_crew = ""
     else:
@@ -87,6 +91,41 @@ def view_log(submissions):
     with open('id_log.txt', 'r') as log:
         return log.read()
 
-subs_viewed = []
-subslist = get_submissions(subreddit, subs_viewed)
-# print_submissions(subslist)
+
+def download_video(subslist, query):
+    if type(query) is list:
+        for choice in query:
+            print('DOWNLOADING {}'.format(choice))
+    else:
+        print('DOWNLOADING {}'.format(query))
+    pass
+
+
+def query_user(subslist):
+    query = input('Please select a movie:\n')
+    if 'dl' in query:
+        download_video(subslist, int(query[3:].split(',')))
+    elif 'quit' in query:
+        exit('QUITTING')
+    else:
+        print_more_info(int(query), subslist)
+        new_query = input('Would you like to download?  (Y/N):\n')
+        if new_query in ['y', 'Y']:
+            download_video(subslist, int(query))
+        elif new_query in ['n', 'N']:
+            print_submissions(subslist)
+            query = input('Please select a movie:\n')
+        else:
+            print('invalid input')
+
+
+def main():
+    subs_viewed = []
+    while True:
+        subslist = get_submissions(subreddit, subs_viewed)
+        print_submissions(subslist)
+        query_user(subslist)
+
+
+if __name__ == '__main__':
+    main()
